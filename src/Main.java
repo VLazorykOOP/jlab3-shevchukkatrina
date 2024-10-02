@@ -68,19 +68,18 @@ class Product extends Mechanism {
     }
 }
 
-// Абстрактний базовий
 abstract class Root {
     public abstract void calculateRoots();
     public abstract void printRoots();
 }
 
-// Похідний клас для лінійних рівнянь (ax + b = 0)
-class Linear extends Root {
+// Похідний для лінійних рівнянь (ax + b = 0)
+class LinearAbstract extends Root {
     private double a;
     private double b;
     private Double root;
 
-    public Linear(double a, double b) {
+    public LinearAbstract(double a, double b) {
         this.a = a;
         this.b = b;
     }
@@ -110,14 +109,14 @@ class Linear extends Root {
 }
 
 // Похідний для квадратних рівнянь (ax^2 + bx + c = 0)
-class Square extends Root {
+class SquareAbstract extends Root {
     private double a;
     private double b;
     private double c;
     private Double root1;
     private Double root2;
 
-    public Square(double a, double b, double c) {
+    public SquareAbstract(double a, double b, double c) {
         this.a = a;
         this.b = b;
         this.c = c;
@@ -156,7 +155,99 @@ class Square extends Root {
     }
 }
 
-// Головний 
+interface RootInterfaceLinear {
+    void calculateRoots();  
+    void printRoots();
+}
+
+interface RootInterfaceSquare {
+    void calculateRoots(); 
+    void printRoots();      
+}
+
+//для лінійних рівнянь (ax + b = 0), що реалізує RootInterfaceLinear
+class Linear implements RootInterfaceLinear {
+    private double a;
+    private double b;
+    private Double root;
+
+    public Linear(double a, double b) {
+        this.a = a;
+        this.b = b;
+    }
+
+    @Override
+    public void calculateRoots() {
+        if (a != 0) {
+            root = -b / a;
+        } else {
+            root = null; // Немає кореня (рівняння не має сенсу)
+        }
+    }
+
+    @Override
+    public void printRoots() {
+        if (root != null) {
+            System.out.println("Linear equation root: x = " + root);
+        } else {
+            System.out.println("No valid root for this linear equation.");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Linear Equation: " + a + "x + " + b + " = 0";
+    }
+}
+
+//для квадратних рівнянь (ax^2 + bx + c = 0), що реалізує RootInterfaceSquare
+class Square implements RootInterfaceSquare {
+    private double a;
+    private double b;
+    private double c;
+    private Double root1;
+    private Double root2;
+
+    public Square(double a, double b, double c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    @Override
+    public void calculateRoots() {
+        double discriminant = b * b - 4 * a * c;
+
+        if (discriminant > 0) {
+            root1 = (-b + Math.sqrt(discriminant)) / (2 * a);
+            root2 = (-b - Math.sqrt(discriminant)) / (2 * a);
+        } else if (discriminant == 0) {
+            root1 = root2 = -b / (2 * a);
+        } else {
+            root1 = root2 = null; // Корені є комплексними
+        }
+    }
+
+    @Override
+    public void printRoots() {
+        if (root1 != null && root2 != null) {
+            if (root1.equals(root2)) {
+                System.out.println("Square equation root: x = " + root1);
+            } else {
+                System.out.println("Square equation roots: x1 = " + root1 + ", x2 = " + root2);
+            }
+        } else {
+            System.out.println("No real roots for this square equation.");
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "Square Equation: " + a + "x^2 + " + b + "x + " + c + " = 0";
+    }
+}
+
+// Головний
 public class Main {
     public static void main(String[] args) {
         List<Detail> details = new ArrayList<>();
@@ -165,25 +256,30 @@ public class Main {
         details.add(new Mechanism("Transmission", "Aluminum", 3.5, 202, 10, "Drive", "Torque Transmission"));
         details.add(new Product("Car Engine", "Cast Iron", 150.0, 303, 50, "Engine", "Power Generation", "V8 Engine", 50000));
 
-        System.out.println("=== Details, assemblies, mechanisms and products ===");
+        System.out.println("\nDetails, Assemblies, Mechanisms, and Products:");
         for (Detail detail : details) {
             detail.show();
-            System.out.println("-------------------");
+            System.out.println();
         }
 
-        Root[] equations = {
-                new Linear(2, -4),
-                new Linear(0, 5),
-                new Square(1, -3, 2),
-                new Square(1, 2, 5)
-        };
+        System.out.println("\nLinear Equation Example (Abstract Class):");
+        LinearAbstract linearEquation = new LinearAbstract(2, 4);
+        linearEquation.calculateRoots();
+        linearEquation.printRoots();
 
-        System.out.println("\n=== Solving equations ===");
-        for (Root equation : equations) {
-            System.out.println(equation);
-            equation.calculateRoots();
-            equation.printRoots();
-            System.out.println("---------------------");
-        }
+        System.out.println("\nSquare Equation Example (Abstract Class):");
+        SquareAbstract squareEquation = new SquareAbstract(1, -3, 2);
+        squareEquation.calculateRoots();
+        squareEquation.printRoots();
+
+        System.out.println("\nUsing Interfaces for Equations:");
+        RootInterfaceLinear linearInterface = new Linear(2, 4);
+        linearInterface.calculateRoots();
+        linearInterface.printRoots();
+
+        System.out.println("\nUsing Interfaces for Equations:");
+        RootInterfaceSquare squareInterface = new Square(1, -3, 2);
+        squareInterface.calculateRoots();
+        squareInterface.printRoots();
     }
 }
